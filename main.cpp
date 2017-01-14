@@ -10,22 +10,20 @@
 #include <accumulate.hpp>
 
 const int weekStartsAt = 1;
-const int firstDayOfYear = 4; // In which index position is the first day of the year. For 2016 that is friday jan 1st.
+const int firstDayOfYear = 6; // In which index position is the first day of the year. For 2017 that is sunday jan 1st.
 
 const std::vector<std::string> dayNamesAccordingToWeekStart(const int weekStartDay)
 {
   // Define dayNames in std::tm tm_wday format. Now we know which day is which index.
-  const std::vector<std::string> dayNames = {"s", "m", "t", "w", "t", "f", "s"};
-  std::vector<std::string> reorderedDayNames(7);
+  std::vector<std::string> dayNames = {"s", "m", "t", "w", "t", "f", "s"};
 
-  for (int index: iter::range(0, 7))
-  {
-    reorderedDayNames[index] = dayNames[((index + weekStartDay) % 7)];
-  }
+  // Rotate the vector so that our week start day becomes index 0.
+  std::rotate(dayNames.begin(), dayNames.begin() + weekStartDay, dayNames.end());
 
-  return reorderedDayNames;
+  return dayNames;
 }
 
+// Leap year calculation (gregorian calendar)
 constexpr bool isLeapYear(const int year)
 {
   return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
