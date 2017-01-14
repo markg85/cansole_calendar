@@ -57,7 +57,7 @@ int main(int, char **)
 
   for (auto &&month : iter::range(1, 13)) // 1, 13 is only for the isLeapYear function that assumes the second (2) month is februari.
   {
-    int daysInCurrentMonth = daysInMonth(month, isLeapYear(tm->tm_year));
+    int daysInCurrentMonth = daysInMonth(month, isLeapYear(1900 + tm->tm_year));
     int dayIndex = ((daysThusFar % 7) + firstDayOfYear);
     int startPosition = (dayIndex > 7) ? dayIndex % 7 : dayIndex;
     daysThusFar += daysInCurrentMonth;
