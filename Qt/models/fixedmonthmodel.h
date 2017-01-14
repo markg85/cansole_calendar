@@ -17,12 +17,12 @@ public:
     isWholeMonth = Qt::UserRole + 1
   };
 
-  FixedMonthModel(QObject *parent = 0);
+  explicit FixedMonthModel(QObject *parent = 0);
 
-  int rowCount(const QModelIndex &parent) const;
-  int columnCount(const QModelIndex &parent) const;
-  QVariant data(const QModelIndex &index, int role) const;
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+  virtual int rowCount(const QModelIndex &parent) const override;
+  virtual int columnCount(const QModelIndex &parent) const override;
+  virtual QVariant data(const QModelIndex &index, int role) const override;
+  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
   void updateModel(int month, int year);
 
