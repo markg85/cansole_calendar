@@ -188,6 +188,4 @@ int FixedMonthModel::dayInCell(int cell) const
   {
     return cell - m_preOffset + 1;
   }
-
-  return 99;
 }
