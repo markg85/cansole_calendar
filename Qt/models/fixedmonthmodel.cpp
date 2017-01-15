@@ -14,12 +14,12 @@
 
 FixedMonthModel::FixedMonthModel(QObject *parent)
   : QAbstractTableModel(parent)
+  , m_daysInPreviousMonth(0)
   , m_preOffset(0)
   , m_postOffset(0)
   , m_month(0)
   , m_year(0)
   , m_firstDayOfWeek(1) // The first day of the week. This is the index in std::tm tm_wday format.
-  , m_calendarMonth(QVector<char>(42))
 {
 
 }
@@ -40,7 +40,7 @@ QVariant FixedMonthModel::data(const QModelIndex &index, int role) const
 {
   if (role == Qt::DisplayRole && index.isValid())
   {
-    return m_calendarMonth[(index.row() * 7) + index.column()];
+    return dayInCell((index.row() * 7) + index.column());
   }
   else if (role == Roles::isWholeMonth)
   {
@@ -92,22 +92,7 @@ void FixedMonthModel::updateModel(int month, int year)
   int preOffset = std::abs(tm.tm_wday - m_firstDayOfWeek);
   m_preOffset = (preOffset == 0) ? 7 : preOffset;
   m_postOffset = 42 - daysInMonth(month, isLeapYear(year)) - m_preOffset;
-  int previousMonth = daysPreviousMonth(month, year);
-
-  for (int i = 0; i < m_preOffset; i++)
-  {
-    m_calendarMonth[i] = previousMonth - (m_preOffset - (i + 1));
-  }
-
-  for (int i = 1, idx = m_preOffset; i <= 42 - (m_preOffset + m_postOffset); i++, idx++)
-  {
-    m_calendarMonth[idx] = i;
-  }
-
-  for (int i = 1, idx = 42 - m_postOffset; i <= m_postOffset; i++, idx++)
-  {
-    m_calendarMonth[idx] = i;
-  }
+  m_daysInPreviousMonth = daysPreviousMonth(month, year);
 
   emit dataChanged(index(0, 0), index(6, 7)); // The whole model is changed.
 }
@@ -187,4 +172,22 @@ constexpr bool FixedMonthModel::isLeapYear(const int year)
 constexpr int FixedMonthModel::daysInMonth(const int month, const bool isLeapYear)
 {
   return 31 - ((month == 2) ? (3 - isLeapYear) : ((month - 1) % 7 % 2));
+}
+
+int FixedMonthModel::dayInCell(int cell) const
+{
+  if (cell < m_preOffset)
+  {
+    return m_daysInPreviousMonth - (m_preOffset - cell) + 1;
+  }
+  else if (cell > (42 - m_postOffset - 1))
+  {
+    return cell - (42 - m_postOffset - 1);
+  }
+  else
+  {
+    return cell - m_preOffset + 1;
+  }
+
+  return 99;
 }

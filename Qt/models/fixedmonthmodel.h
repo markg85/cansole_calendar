@@ -2,7 +2,6 @@
 #define FIXEDMONTHMODEL_H
 
 #include <QAbstractTableModel>
-#include <QVector>
 
 class FixedMonthModel : public QAbstractTableModel
 {
@@ -40,12 +39,27 @@ private:
   int daysPreviousMonth(int month, int year);
   constexpr static bool isLeapYear(const int year);
   constexpr static int daysInMonth(const int month, const bool isLeapYear);
+
+  // Calculate which day needs to be shown in a given cell.
+  inline int dayInCell(int cell) const;
+
+  // We need to know from where to count down in the few cells from the previous month.
+  int m_daysInPreviousMonth;
+
+  // The number of days to display before the current month.
   int m_preOffset;
+
+  // The number of days to display after the current month.
   int m_postOffset;
+
+  // Which month is visible.
   int m_month;
+
+  // Which year for the current month.
   int m_year;
+
+  // The first day of the week is... Monday is common in the western world.
   char m_firstDayOfWeek;
-  QVector<char> m_calendarMonth;
 };
 
 #endif // FIXEDMONTHMODEL_H
