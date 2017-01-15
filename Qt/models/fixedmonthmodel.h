@@ -37,7 +37,11 @@ public slots:
 
 private:
   int daysPreviousMonth(int month, int year);
+
+  // This follows the gregorian leap year rules!
   constexpr static bool isLeapYear(const int year);
+
+  // Returns how many days are in a given month. You must provide if the given month comes from a leap year since that will influence the days in Februari.
   constexpr static int daysInMonth(const int month, const bool isLeapYear);
 
   // Calculate which day needs to be shown in a given cell.
