@@ -16,7 +16,6 @@ FixedMonthModel::FixedMonthModel(QObject *parent)
   : QAbstractTableModel(parent)
   , m_daysInPreviousMonth(0)
   , m_preOffset(0)
-  , m_postOffset(0)
   , m_month(0)
   , m_year(0)
   , m_firstDayOfWeek(1) // The first day of the week. This is the index in std::tm tm_wday format.
@@ -38,14 +37,16 @@ int FixedMonthModel::columnCount(const QModelIndex &parent) const
 
 QVariant FixedMonthModel::data(const QModelIndex &index, int role) const
 {
+  const int day = (index.row() * 7) + index.column();
+
   if (role == Qt::DisplayRole && index.isValid())
   {
-    return dayInCell((index.row() * 7) + index.column());
+    return dayInCell(day);
   }
   else if (role == Roles::isWholeMonth)
   {
-    int day = (index.row() * 7) + index.column();
-    return (day > m_preOffset && (day < (42 - m_postOffset)));
+
+    return isDayInWholeMonth(day);
   }
 
   return QVariant();
@@ -91,7 +92,6 @@ void FixedMonthModel::updateModel(int month, int year)
 
   int preOffset = std::abs(tm.tm_wday - m_firstDayOfWeek);
   m_preOffset = (preOffset == 0) ? 7 : preOffset;
-  m_postOffset = 42 - daysInMonth(month, isLeapYear(year)) - m_preOffset;
   m_daysInPreviousMonth = daysPreviousMonth(month, year);
 
   emit dataChanged(index(0, 0), index(6, 7)); // The whole model is changed.
@@ -176,16 +176,24 @@ constexpr int FixedMonthModel::daysInMonth(const int month, const bool isLeapYea
 
 int FixedMonthModel::dayInCell(int cell) const
 {
+  const int daysTillPostOffset = daysInMonth(m_month, isLeapYear(m_year)) + m_preOffset;
+
   if (cell < m_preOffset)
   {
     return m_daysInPreviousMonth - (m_preOffset - cell) + 1;
   }
-  else if (cell > (42 - m_postOffset - 1))
+  else if (cell > (daysTillPostOffset - 1))
   {
-    return cell - (42 - m_postOffset - 1);
+    return cell - (daysTillPostOffset - 1);
   }
   else
   {
     return cell - m_preOffset + 1;
   }
+}
+
+bool FixedMonthModel::isDayInWholeMonth(const int day) const
+{
+  const int days = daysInMonth(m_month, isLeapYear(m_year)) + m_preOffset;
+  return (day >= m_preOffset && day < days);
 }

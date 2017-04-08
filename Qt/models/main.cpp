@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
   view->resize(800, 600);
   view->show();
 
-
   QTimer::singleShot(5000, [&model](){
     model->updateModel(2, 2016);
     qDebug() << "View should now display Februari 2016.";

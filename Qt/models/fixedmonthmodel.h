@@ -47,14 +47,14 @@ private:
   // Calculate which day needs to be shown in a given cell.
   inline int dayInCell(int cell) const;
 
+  // Returns true is the given day belongs in the currently visible month (excluding the pre- and post days).
+  inline bool isDayInWholeMonth(const int day) const;
+
   // We need to know from where to count down in the few cells from the previous month.
   int m_daysInPreviousMonth;
 
   // The number of days to display before the current month.
   int m_preOffset;
-
-  // The number of days to display after the current month.
-  int m_postOffset;
 
   // Which month is visible.
   int m_month;
